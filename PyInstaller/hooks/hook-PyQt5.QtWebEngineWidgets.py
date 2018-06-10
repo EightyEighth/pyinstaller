@@ -22,13 +22,14 @@ if compat.is_darwin:
     # This is based on the layout of the Mac wheel from PyPi.
     data_path = pyqt5_library_info.location['DataPath']
     resources = ['lib', 'QtWebEngineCore.framework', 'Resources']
-    web_engine_process = ['lib', 'QtWebEngineCore.framework', 'Helpers']
+    web_engine_process = ['lib', 'QtWebEngineCore.framework', 'Helpers',
+                          'QtWebEngineProcess.app']
+    # These resource files for QtWebEngineProcess.app must located in
+    # ``.app/Content/Resources``; see https://doc.qt.io/qt-5.10/qtwebengine-deploying.html
+    datas += [(os.path.join(data_path, *resources), '.')]
     # When Python 3.4 goes EOL (see
     # `PEP 448 <https://www.python.org/dev/peps/pep-0448/>`_, this is
     # better written as ``os.path.join(*rel_data_path, *resources[:-1])``.
-    datas += collect_system_data_files(
-        os.path.join(data_path, *resources),
-        os.path.join(*(rel_data_path + resources[:-1])), True)
     datas += collect_system_data_files(
         os.path.join(data_path, *web_engine_process),
         os.path.join(*(rel_data_path + web_engine_process[:-1])), True)
@@ -56,7 +57,7 @@ else:
                       'QtWebEngineProcess*'),
          os.path.join(*(rel_data_path +
                       [remove_prefix(pyqt5_library_info.location['LibraryExecutablesPath'],
-                                    pyqt5_library_info.location['PrefixPath'] + '/')])))
+                                     pyqt5_library_info.location['PrefixPath'] + '/')])))
     ]
 
 # Add Linux-specific libraries.
