@@ -911,6 +911,23 @@ def get_installer(module):
             return 'homebrew'
     return None
 
+
+# Given a package name as a string, return a tuple of ``datas, binaries,
+# hiddenimports`` containing all data files, binaries, and modules in the given
+# package. The value of ``include_py_files`` is passed directly to
+# ``collect_data_files``.
+def collect_all(package, include_py_files=False):
+    datas = []
+    try:
+        datas += copy_metadata(package)
+    except Exception as e:
+        logger.warning('Unable to copy metadata for %s: %s', package, e)
+    datas += collect_data_files(package, include_py_files)
+    binaries = collect_dynamic_libs(package)
+    hiddenimports = collect_submodules(package)
+    return datas, binaries, hiddenimports
+
+
 # These imports need to be here due to these modules recursively importing this module.
 from .django import *
 from .gi import *
