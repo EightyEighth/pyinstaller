@@ -170,9 +170,9 @@ def __add_options(parser):
                    nargs='?',
                    # If zero arguments are specified (``--debug`` by itself),
                    # then provide a default argument of all debug options enabled.
-                   const=['imports', 'bootloader', 'noarchive'],
+                   const='all',
                    # The options specified must come from this list.
-                   choices=['imports', 'bootloader', 'noarchive'],
+                   choices=['all', 'imports', 'bootloader', 'noarchive'],
                    # Append choice, rather than storing them (which would
                    # overwrite any previous selections).
                    action='append',
@@ -180,8 +180,11 @@ def __add_options(parser):
                    # ``_SmartFormatter`` in ``__main__.py``.
                    help=("R|Provide assistance with debugging a frozen\n"
                          "application, by specifying one or more of the\n"
-                         "following choices. If no choice is given, all three\n"
-                         "choices will be enabled.\n"
+                         "following choices.\n"
+                         "\n"
+                         "- all: All three of the below options; this is the\n"
+                         "  default choice, unless one of the choices below is\n"
+                         "  specified.\n"
                          "\n"
                          "- imports: specify the -v option to the underlying\n"
                          "  Python interpreter, causing it to print a message\n"
@@ -378,7 +381,11 @@ def main(scripts, name=None, onefile=None,
         cipher_init = cipher_absent_template
 
     # Translate the default of ``debug=None`` to an empty list.
-    debug = [] if debug is None else debug
+    if debug is None:
+        debug = []
+    # Translate the ``all`` option.
+    if 'all' in debug:
+        debug = ['imports', 'bootloader', 'noarchive']
 
     d = {
         'scripts': scripts,
